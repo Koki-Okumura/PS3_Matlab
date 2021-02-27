@@ -85,3 +85,5 @@ while test_B > tol_B && iter_B <= max_iter_B
     test_B = abs(B);
     iter_B = iter_B + 1;
 end
+
+save('results')

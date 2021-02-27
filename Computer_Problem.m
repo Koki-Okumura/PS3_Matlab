@@ -10,18 +10,19 @@ beta = 0.95;
 b_1 = -15;
 b_N = 60;
 N = 151;
-b = linspace(b_1,b_N,N)';
+b = linspace(b_1,b_N,N);
 
 % tolerance
-tol_B = 0.0001;
+tol_B = 0.1;
 tol_V = 0.0001;
 
 % max iteration
-max_iter_B = 100;
-max_iter_V = 100;
+max_iter_B = 1000;
+max_iter_V = 1000;
 
 q = beta;
-adjust = 0.0001;
+q_low = beta;
+q_high = 1;
 test_B = 1;
 iter_B = 1;
 while test_B > tol_B && iter_B <= max_iter_B
@@ -45,8 +46,8 @@ while test_B > tol_B && iter_B <= max_iter_B
     test_V = 1;
     iter_V = 1;
     while test_V > tol_V && iter_V <= max_iter_V
-        [V_new(:,1),b_policy(:,1)] = max(u(:,:,1) + beta*phi(1,1)*ones(N,1)*V(:,1)' + beta*phi(2,1)*ones(N,1)*V(:,2)',[],2);
-        [V_new(:,2),b_policy(:,2)] = max(u(:,:,2) + beta*phi(1,2)*ones(N,1)*V(:,1)' + beta*phi(2,2)*ones(N,1)*V(:,2)',[],2);
+        [V_new(:,1),b_policy(:,1)] = max(u(:,:,1) + beta*ones(N,1)*(phi(1,1)*V(:,1)' + phi(1,2)*V(:,2)'),[],2);
+        [V_new(:,2),b_policy(:,2)] = max(u(:,:,2) + beta*ones(N,1)*(phi(2,1)*V(:,1)' + phi(2,2)*V(:,2)'),[],2);
         test_V = max(max(abs(V_new - V)));
         V = V_new;
         iter_V = iter_V + 1;
@@ -67,10 +68,19 @@ while test_B > tol_B && iter_B <= max_iter_B
     stationary_dist = f(:,x)/sum(f(:,x));
     
     % bond market clearing
-    B = b'*(stationary_dist(1:N) + stationary_dist(N+1:2*N));
+    B = b*(stationary_dist(1:N) + stationary_dist(N+1:2*N));
     
-    %adjust bond price
-    q = q + adjust*B;
+    % adust bond price
+    if B > 0
+        q_low = q;
+    else
+        q_high = q;
+    end
+    q = (q_low + q_high)/2;
+    
+    % display aggregate bond and bond price
+    display(B)
+    display(q)
     
     test_B = abs(B);
     iter_B = iter_B + 1;

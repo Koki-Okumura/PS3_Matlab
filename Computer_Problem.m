@@ -20,9 +20,13 @@ tol_V = 0.0001;
 max_iter_B = 1000;
 max_iter_V = 1000;
 
+% initial bond price
 q = beta;
+
+% lowest and highest bond price used in the bisection method
 q_low = beta;
 q_high = 1;
+
 test_B = 1;
 iter_B = 1;
 while test_B > tol_B && iter_B <= max_iter_B
@@ -67,10 +71,10 @@ while test_B > tol_B && iter_B <= max_iter_B
     [~,x] = min(abs(diag(eig_value) - 1));
     stationary_dist = f(:,x)/sum(f(:,x));
     
-    % bond market clearing
+    % aggregate demand for bond
     B = b*(stationary_dist(1:N) + stationary_dist(N+1:2*N));
     
-    % adust bond price
+    % update bond price using bisection method
     if B > 0
         q_low = q;
     else

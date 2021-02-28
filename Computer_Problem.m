@@ -12,24 +12,20 @@ b_N = 60;
 N = 151;
 b = linspace(b_1,b_N,N);
 
-% tolerance
-tol_B = 0.1;
+% initial bond price
+q = beta;
+
+% tolerance for value function iteration
 tol_V = 0.0001;
 
 % max iteration
 max_iter_B = 1000;
 max_iter_V = 1000;
 
-% initial bond price
-q = beta;
+% adjustment parameter for bond price
+adj = 0.0001;
 
-% lowest and highest bond price used in the bisection method
-q_low = beta;
-q_high = 1;
-
-test_B = 1;
-iter_B = 1;
-while test_B > tol_B && iter_B <= max_iter_B
+for iter_B = 1:max_iter_B
     
     % utility function
     u = NaN(N,N,2);
@@ -74,20 +70,17 @@ while test_B > tol_B && iter_B <= max_iter_B
     % aggregate demand for bond
     B = b*(stationary_dist(1:N) + stationary_dist(N+1:2*N));
     
-    % update bond price using bisection method
+    % update bond price
     if B > 0
-        q_low = q;
+        q = q + adj;
     else
-        q_high = q;
+        break
     end
-    q = (q_low + q_high)/2;
     
-    % display aggregate bond and bond price
     display(B)
     display(q)
-    
-    test_B = abs(B);
-    iter_B = iter_B + 1;
 end
 
+display(B)
+display(q)
 save('results')

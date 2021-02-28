@@ -70,6 +70,10 @@ for iter_B = 1:max_iter_B
     % aggregate demand for bond
     B = b*(stationary_dist(1:N) + stationary_dist(N+1:2*N));
     
+    % display aggregate demand for bond and bond price
+    display(B)
+    display(q)
+    
     % update bond price
     if B > 0
         q = q + adj;
@@ -77,10 +81,6 @@ for iter_B = 1:max_iter_B
         break
     end
     
-    display(B)
-    display(q)
 end
 
-display(B)
-display(q)
 save('results')
